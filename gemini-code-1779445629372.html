@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus in Food Security: Paddy Drying Rates</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased">
+
+    <header class="bg-emerald-700 text-white shadow-md py-6 px-4 mb-8">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <span class="bg-emerald-900 text-emerald-300 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">SFM / SFP Academic App</span>
+                <h1 class="text-3xl font-extrabold mt-1">Calculus in Food Security</h1>
+                <p class="text-emerald-100 text-sm mt-1">Optimizing Paddy Moisture Content via Derivatives $f'(t)$</p>
+            </div>
+            <div class="text-right md:border-l md:border-emerald-600 md:pl-6">
+                <p class="text-xs text-emerald-200">Context: Malaysian Agriculture</p>
+                <p class="text-sm font-semibold text-white">Target Safe Moisture: 14%</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 pb-16">
+        
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+            <h2 class="text-xl font-bold text-slate-900 mb-3 flex items-center gap-2">
+                🌾 The Bioscience Context: Post-Harvest Preservation
+            </h2>
+            <p class="text-slate-600 leading-relaxed mb-4">
+                In Malaysia, harvested paddy typically has a high moisture content of around <strong>24%</strong>. To ensure long-term <strong>Food Security (SFM)</strong> and prevent fungal growth or spoilage during silo storage, it must be rapidly and uniformly dried down to a safe level of <strong>14%</strong>. 
+            </p>
+            <p class="text-slate-600 leading-relaxed mb-4">
+                Using standard heated air drying (at roughly 45°C), the moisture loss follows an exponential decay pattern. 
+                By applying <strong>derivatives</strong>, we can find the exact <strong>rate of drying (% moisture loss per hour)</strong> at any specific time $t$. This prevents over-drying (which cracks the rice kernels, reducing head rice yield) and saves processing energy.
+            </p>
+            <div class="bg-slate-50 border-l-4 border-slate-400 p-3 rounded-r text-xs text-slate-500">
+                <strong>Data Reference Framework:</strong> Parameters adapted from realistic Malaysian mechanical paddy drying profiles documented in standard agricultural literature like the <em>"Mardi Research Journal"</em> and MARDI's post-harvest engineering guidelines.
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
+                <h3 class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1">Moisture Function $f(t)$</h3>
+                <p class="text-2xl font-mono font-bold text-emerald-950 my-2">f(t) = 10 · e<sup>-0.15t</sup> + 14</p>
+                <p class="text-xs text-emerald-700 leading-relaxed">
+                    Predicts the paddy moisture percentage at hour $t$. The <span class="font-semibold">14</span> represents the equilibrium/target moisture boundary, while <span class="font-semibold">10</span> represents the ambient moisture drop required ($24\% - 14\%$).
+                </p>
+            </div>
+            
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-5">
+                <h3 class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Drying Rate Derivative $f'(t)$</h3>
+                <p class="text-2xl font-mono font-bold text-amber-950 my-2">f'(t) = -1.5 · e<sup>-0.15t</sup></p>
+                <p class="text-xs text-amber-700 leading-relaxed">
+                    Calculated using the Chain Rule. It yields the exact speed of evaporation (% moisture drop per hour) at moment $t$. The negative sign indicates moisture is decreasing.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Moisture Decay Curve</h3>
+                        <p class="text-xs text-slate-400">Click anywhere on the curve line to calculate the derivative at that hour.</p>
+                    </div>
+                    <button onclick="resetAnimation()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-1.5 px-3 rounded transition">
+                        🔄 Replay Animation
+                    </button>
+                </div>
+                <div class="relative w-full h-[350px]">
+                    <canvas id="dryingChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 text-white rounded-xl shadow-xl p-6 h-full flex flex-col justify-between">
+                <div>
+                    <h3 class="text-amber-400 font-bold text-xs uppercase tracking-widest mb-4">🔬 Real-time Calculus Analysis</h3>
+                    
+                    <div id="instructional-text" class="text-slate-400 text-sm space-y-2">
+                        <p>📍 <strong>Interactive Guide:</strong></p>
+                        <p class="text-xs">Click directly on any data point along the graph line to extract the derivative data from that specific stage of the food preservation process.</p>
+                    </div>
+
+                    <div id="analysis-result" class="hidden space-y-6">
+                        <div>
+                            <span class="text-xs text-slate-400 block uppercase">Process Duration</span>
+                            <span id="out-time" class="text-3xl font-extrabold font-mono text-white">0</span> <span class="text-sm text-slate-400">Hours in Dryer</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase">Current Moisture $f(t)$</span>
+                                <span id="out-moisture" class="text-xl font-bold font-mono text-emerald-400">0%</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase">Drying Rate $f'(t)$</span>
+                                <span id="out-rate" class="text-xl font-bold font-mono text-amber-400">0% / hr</span>
+                            </div>
+                        </div>
+
+                        <hr class="border-slate-800">
+
+                        <div>
+                            <span class="text-xs text-amber-400 font-bold block uppercase mb-1">Layman Bioscience Breakdown:</span>
+                            <p id="out-explanation" class="text-sm text-slate-300 leading-relaxed italic bg-slate-950 p-3 rounded-lg border border-slate-800">
+                                Click a point to see analysis.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-slate-800 text-[11px] text-slate-500">
+                    Designed for Agro-Bioscience Web Systems simulation tasks.
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // Generating realistic data coordinates based on f(t) = 10 * e^(-0.15t) + 14
+        const hours = Array.from({length: 17}, (_, i) => i); // 0 to 16 hours
+        const moistureData = hours.map(t => +(10 * Math.exp(-0.15 * t) + 14).toFixed(2));
+        const rateData = hours.map(t => +(-1.5 * Math.exp(-0.15 * t)).toFixed(2));
+
+        let chartInstance;
+
+        function initChart() {
+            const ctx = document.getElementById('dryingChart').getContext('2d');
+            
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: hours,
+                    datasets: [{
+                        label: 'Paddy Moisture Level (%)',
+                        data: moistureData,
+                        borderColor: '#059669', // Emerald 600
+                        borderWidth: 3,
+                        backgroundColor: 'rgba(5, 150, 105, 0.05)',
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#059669'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Drying Time (Hours)', color: '#475569', font: { weight: 'bold' } },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y: {
+                            min: 12,
+                            max: 26,
+                            title: { display: true, text: 'Moisture Content (%)', color: '#475569', font: { weight: 'bold' } },
+                            grid: { color: '#e2e8f0' }
+                        }
+                    },
+                    animation: {
+                        duration: 1800,
+                        easing: 'easeOutQuart'
+                    },
+                    // Capture clicks on the chart
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            calculateDerivativeAtPoint(index);
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateDerivativeAtPoint(index) {
+            const t = hours[index];
+            const moisture = moistureData[index];
+            const rate = rateData[index]; // f'(t) value
+            const positiveRate = Math.abs(rate); // Magnitude for layman text
+
+            // Update UI fields
+            document.getElementById('instructional-text').classList.add('hidden');
+            document.getElementById('analysis-result').classList.remove('hidden');
+
+            document.getElementById('out-time').innerText = t;
+            document.getElementById('out-moisture').innerText = moisture + "%";
+            document.getElementById('out-rate').innerText = rate + "% / hr";
+
+            // Generate contextual bioscience explanations based on the derivative value
+            let laymanExplanation = "";
+            if (t === 0) {
+                laymanExplanation = `At the absolute start, surface water evaporates instantly. The paddy is shedding moisture rapidly at ${positiveRate}% per hour. High risk of thermal stress if temperature is bumped too high!`;
+            } else if (t > 0 && t <= 4) {
+                laymanExplanation = `Early processing window. The grains are losing moisture quickly (${positiveRate}% per hour) because water is migrating easily from the outer layers of the grain husks.`;
+            } else if (t > 4 && t <= 10) {
+                laymanExplanation = `The drying rate is slowing down to ${positiveRate}% per hour. Free surface water is gone; we are now drawing out bound internal moisture deeply trapped inside the rice endosperm.`;
+            } else {
+                laymanExplanation = `The process is flattening out. The change is minor (${positiveRate}% per hour) as the rice gets close to safe storage equilibrium (14%). It is highly efficient to turn down heat/fans now to save fuel costs.`;
+            }
+
+            document.getElementById('out-explanation').innerHTML = laymanExplanation;
+            
+            // Visual feedback indicator update on chart
+            chartInstance.setActiveElements([{datasetIndex: 0, index: index}]);
+            chartInstance.update();
+        }
+
+        function resetAnimation() {
+            chartInstance.destroy();
+            document.getElementById('instructional-text').classList.remove('hidden');
+            document.getElementById('analysis-result').classList.add('hidden');
+            initChart();
+        }
+
+        // Initialize on windows load
+        window.onload = initChart;
+    </script>
+</body>
+</html>
